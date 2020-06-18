@@ -67,6 +67,30 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         return responseCallback;
     }
 
+    function get_lights(selector){
+        // Gets all lights on network, returns dict
+        // Selector is defined as per https://api.developer.lifx.com/v1/docs/selectors
+        // e.g. 'all' for all lights, 'id:afs097fds87a4f' for a specific light ID
+
+        if (selector == null) {
+            selector = "all";
+        }
+
+        System.println("Using selector: " + selector);
+        var url = "https://api.lifx.com/v1/lights/all";
+        var params = null;
+        var options = {
+                :method => comms.HTTP_REQUEST_METHOD_GET,
+                :headers => HEADERS,
+                :responseType => comms.HTTP_RESPONSE_CONTENT_TYPE_JSON
+                };
+        var responseCallback = method(:onReceive);
+
+        // Make the Communications.makeWebRequest() call
+        comms.makeWebRequest(url, params, options, method(:onReceive));
+        return responseCallback;
+    }
+
     function set_scene(scene_uuid) {
         var url_format = "https://api.lifx.com/v1/scenes/scene_id:$1$/activate";                         // set the url
         var url = Lang.format(url_format, [scene_uuid]);

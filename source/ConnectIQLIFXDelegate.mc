@@ -25,7 +25,8 @@ class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
         notify.invoke("Executing\nRequest");
         var lifx_api;
         lifx_api = new LIFX_API(self.notify);
-        lifx_api.power_toggle();
+//        lifx_api.power_toggle();
+        lifx_api.get_lights(null);
     }
 
 

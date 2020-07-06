@@ -26,6 +26,7 @@ else:
 
 SCENE_UUID = scenes[1]["uuid"]
 
-apply_scene_req = requests.put(f"https://api.lifx.com/v1/scenes/scene_id:{SCENE_UUID}/activate", headers=headers)
-
-power_toggle_rq = requests.post('https://api.lifx.com/v1/lights/all/toggle', headers=headers)
+# apply_scene_req = requests.put(f"https://api.lifx.com/v1/scenes/scene_id:{SCENE_UUID}/activate", headers=headers)
+#
+# power_toggle_rq = requests.post('https://api.lifx.com/v1/lights/all/toggle', headers=headers)
+#

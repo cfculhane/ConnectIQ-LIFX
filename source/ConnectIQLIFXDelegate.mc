@@ -2,10 +2,10 @@
 using Toybox.Communications;
 using Toybox.WatchUi;
 
+
 class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
     var notify;
     var lifx_api;
-    var scenes;
     // Set up the callback to the view
     function initialize(handler) {
         WatchUi.BehaviorDelegate.initialize();
@@ -22,12 +22,12 @@ class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
         var delegate;
         menu.setTitle("Select Scene");
         var num_scenes = lifx_api.scenes.size();
-        System.println("Attempting to display " + num_scenes);
+        System.println("Number of scenes to display: "+ num_scenes);
         for( var i = 0; i < num_scenes; i++ ) {
-            menu.addItem(lifx_api.scenes[i]["name"], :one);
+            menu.addItem(lifx_api.scenes[i]["name"], lifx_api.scenes[i]["scene_num"]);
         }
 
-        delegate = new WatchUi.MenuInputDelegate(); // a WatchUi.Menu2InputDelegate
+        delegate = new LifxSceneInputDelegate(self.lifx_api);
         WatchUi.pushView(menu, delegate, WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -45,5 +45,21 @@ class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
 //        lifx_api.get_lights(null);
     }
 
+}
 
+
+
+
+class LifxSceneInputDelegate extends WatchUi.MenuInputDelegate {
+    private var lifx_api;
+    function initialize(api_obj) {
+        MenuInputDelegate.initialize();
+        lifx_api = api_obj;
+    }
+
+    function onMenuItem(item) {
+        System.println("Recieved item: " + item);
+        var selected_scene = lifx_api.scenes[item];
+        lifx_api.set_scene(selected_scene["uuid"]);
+    }
 }

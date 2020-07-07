@@ -6,6 +6,8 @@ using Toybox.WatchUi;
 using Toybox.Background;
 using Toybox.Application as app;
 
+
+
 enum
 {
     ACCESS_TOKEN
@@ -43,11 +45,14 @@ class LifxLight {
 
 class LIFX_API extends WatchUi.BehaviorDelegate {
     var notify;
-    public var scenes = {};
-    public var lights = {};
+    public var scenes;
+    public var lights;
     public var locations;
     public var groups;
     public var access_token;
+    var mySetting = Application.getApp().getProperty("mySetting");
+
+
 
 //    function isAuthenticated() {
 //        var app_obj = Application.getApp();
@@ -111,17 +116,15 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         if (is_http_ok(responseCode)){
             var num_scenes = data.size();
             System.println("Number of scenes returned: " + num_scenes);
-//            for( var i = 0; i < num_scenes; i++ ) {
-//                self.scenes.put(data[i]["name"], data[i]["uuid"]);
-//            }
+
             self.scenes = data;
+            for( var i = 0; i < num_scenes; i++ ) {
+                self.scenes[i].put("scene_num", i);
+            }
             System.println("Scene request Successful, written data below:");
             System.println(self.scenes);
-            notify.invoke(self.scenes);
         }
 
-//        Background.exit(data);
-        //return data;
     }
 
     function parse_lights(responseCode, data) {
@@ -149,10 +152,9 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
                 :headers => HEADERS,
                 :responseType => comms.HTTP_RESPONSE_CONTENT_TYPE_JSON
                 };
-        var responseCallback = method(:onReceive);
 
         // Make the Communications.makeWebRequest() call
-        comms.makeWebRequest(url, params, options, method(:onReceive));
+        comms.makeWebRequest(url, params, options, method(:http_generic_handler));
         notify.invoke("Lights toggled");
     }
 
@@ -177,6 +179,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
         // Make the Communications.makeWebRequest() call
         comms.makeWebRequest(url, params, options, responseCallback);
+        notify.invoke("Getting lights...");
     }
 
         function get_scenes(){
@@ -194,12 +197,13 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
         // Make the Communications.makeWebRequest() call
         comms.makeWebRequest(url, params, options, method(:parse_scenes));
+        notify.invoke("Getting scenes...");
     }
 
     function set_scene(scene_uuid) {
         var url_format = BASE_URL + "/scenes/scene_id:$1$/activate";                         // set the url
         var url = Lang.format(url_format, [scene_uuid]);
-        System.println("Settings scene with URL : " + url);
+        System.println("Setting scene with URL : " + url);
 
         var params = null;
         var options = {                                             // set the options
@@ -210,5 +214,6 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
            // Make the Communications.makeWebRequest() call
            comms.makeWebRequest(url, params, options, method(:http_generic_handler));
+
       }
 }

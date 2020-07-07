@@ -3,6 +3,7 @@ using Toybox.WatchUi;
 
 class ConnectIQLIFXApp extends Application.AppBase {
     hidden var mView;
+    var lifx_api;
     function initialize() {
         AppBase.initialize();
     }
@@ -17,8 +18,9 @@ class ConnectIQLIFXApp extends Application.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-        mView = new ConnectIQLIFXView();
-        return [mView, new ConnectIQLIFXDelegate(mView.method(:onReceive))];
+        lifx_api = new LIFX_API();
+        mView = new ConnectIQLIFXView(lifx_api);
+        return [mView, new ConnectIQLIFXDelegate(lifx_api, mView.method(:onReceive))];
     }
 
 }

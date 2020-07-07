@@ -18,30 +18,7 @@ const HEADERS = {"User-Agent"=> "connectIQ-LIFX/0.0.0",
                  "Authorization"=> "Bearer " + API_TOKEN
                  };
 
-
-const TEST_SCENE_UUID = "67374067-1a0b-48b6-9120-900312077693";
 const BASE_URL = "https://api.lifx.com/v1";
-
-class LifxGroup {
-    // Reperesents a Lifx Group, e.g. "Bedroom"
-    var name = "";
-    var id = "";
-}
-
-class LifxLocation {
-    // Reperesents a Lifx Location, e.g. "Home"
-    var name = "";
-    var id = "";
-}
-
-
-class LifxLight {
-    var name = "";
-    var uuid = "";
-    var id = "";
-    var group;
-    var location;
-}
 
 class LIFX_API extends WatchUi.BehaviorDelegate {
     var notify;
@@ -60,9 +37,8 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 //        return (token != null);
 //    }
 
-    function initialize(handler) {
+    function initialize() {
         WatchUi.BehaviorDelegate.initialize();
-        notify = handler;
 //        if (self.isAuthenticated()){
 //            self.access_token = Application.getApp().getProperty(ACCESS_TOKEN);
             self.get_scenes();
@@ -71,34 +47,16 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
             System.println("self.lights: " + self.lights);
 //        } else {
             System.println("Not authenticated, redirecting to LIFX page");
-            notify.invoke("Not authenticated, redirecting to LIFX page");
 //            comms.openWebPage("https://cloud.lifx.com/settings", {}, {});
 
 //        }
 
-
-    }
-
-    function makeRequest() {
-        notify.invoke("Executing\nRequest");
-
-//        Communications.makeWebRequest(
-//            "https://jsonplaceholder.typicode.com/todos/115",
-//            {
-//            },
-//            {
-//                "Content-Type" => Communications.REQUEST_CONTENT_TYPE_URL_ENCODED
-//            },
-//            method(:onReceive)
-//        );
-        self.power_toggle();
     }
 
     function is_http_ok(responseCode) {
         if (responseCode == 200 or responseCode == 207) {
             return true;
         } else {
-            notify.invoke("Failed to load\nError: " + responseCode.toString());
             return false;
         }
     }
@@ -136,27 +94,14 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
             var num_lights = data.size();
             System.println("Number of lights returned: " + num_lights);
             self.lights = data;
+            for( var i = 0; i < num_lights; i++ ) {
+                self.lights[i].put("light_num", i);  // Used as a symbol later on, has to be a number
+            }
             System.println("Lights request Successful, written data below:");
             System.println(self.lights);
-            notify.invoke(self.lights);
         }
     }
 
-
-    function power_toggle(){
-        // Just toggles the power state of ALL lights
-        var url = BASE_URL + "/lights/all/toggle";
-        var params = null;
-        var options = {
-                :method => comms.HTTP_REQUEST_METHOD_POST,
-                :headers => HEADERS,
-                :responseType => comms.HTTP_RESPONSE_CONTENT_TYPE_JSON
-                };
-
-        // Make the Communications.makeWebRequest() call
-        comms.makeWebRequest(url, params, options, method(:http_generic_handler));
-        notify.invoke("Lights toggled");
-    }
 
     function get_lights(selector){
         // Gets all lights on network, returns dict
@@ -179,10 +124,9 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
         // Make the Communications.makeWebRequest() call
         comms.makeWebRequest(url, params, options, responseCallback);
-        notify.invoke("Getting lights...");
     }
 
-        function get_scenes(){
+    function get_scenes(){
         // Gets all scenes on accont, returns dict
         // e.g. 'all' for all lights, 'id:afs097fds87a4f' for a specific light ID
 
@@ -197,7 +141,6 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
         // Make the Communications.makeWebRequest() call
         comms.makeWebRequest(url, params, options, method(:parse_scenes));
-        notify.invoke("Getting scenes...");
     }
 
     function set_scene(scene_uuid) {
@@ -208,6 +151,28 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         var params = null;
         var options = {                                             // set the options
                :method => comms.HTTP_REQUEST_METHOD_PUT,      // set HTTP method
+               :headers => HEADERS,
+               :responseType => comms.HTTP_RESPONSE_CONTENT_TYPE_JSON
+           };
+
+           // Make the Communications.makeWebRequest() call
+           comms.makeWebRequest(url, params, options, method(:http_generic_handler));
+    }
+
+    function toggle_power(selector) {
+        // Toggle power of a light / group / all etc
+        // Selector is defined as per https://api.developer.lifx.com/v1/docs/selectors
+        // e.g. 'all' for all lights, 'id:afs097fds87a4f' for a specific light ID
+        if (selector == null) {
+            selector = "all";
+        }
+        var url_format = BASE_URL + "/lights/$1$/toggle";
+        var url = Lang.format(url_format, [selector]);
+        System.println("Toggling power with URL : " + url);
+
+        var params = null;
+        var options = {                                             // set the options
+               :method => comms.HTTP_REQUEST_METHOD_POST,      // set HTTP method
                :headers => HEADERS,
                :responseType => comms.HTTP_RESPONSE_CONTENT_TYPE_JSON
            };

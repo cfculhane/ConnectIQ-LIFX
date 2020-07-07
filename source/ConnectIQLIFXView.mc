@@ -5,6 +5,8 @@ class ConnectIQLIFXView extends WatchUi.View {
     hidden var mMessage = "Press menu button";
     hidden var mModel;
     hidden var lifx_api;
+    var main_menu;
+    var main_menu_delegate;
     function initialize(api_obj) {
         WatchUi.View.initialize();
         lifx_api = api_obj;
@@ -13,19 +15,21 @@ class ConnectIQLIFXView extends WatchUi.View {
     // Load your resources here
     function onLayout(dc) {
         mMessage = "Loading data from LIFX...";
+        main_menu = gen_main_menu();
+        main_menu_delegate = new LifxMainInputDelegate(self.lifx_api);
     }
 
     // Restore the state of the app and prepare the view to be shown
     function onShow() {
         // Start initial view
-        var init_menu = new WatchUi.Menu();
-        var init_menu_delegate;
-        init_menu.setTitle("Select operation");
-        init_menu.addItem("Toggle all lights", :toggle_all_lights);
-        init_menu.addItem("Apply a Scene", :apply_scene);
-        init_menu.addItem("Toggle a light", :toggle_light);
-        init_menu_delegate = new LifxMainInputDelegate(self.lifx_api);
-        WatchUi.pushView(init_menu, init_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+        var selection = Application.getApp().getSelection();
+        if (selection == null) {
+            Application.getApp().setSelection(false);
+            WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+        }
+        else if (selection == false) {
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        }
     }
 
     // Update the view
@@ -38,7 +42,21 @@ class ConnectIQLIFXView extends WatchUi.View {
     // Called when this View is removed from the screen. Save the
     // state of your app here.
     function onHide() {
+        return true;
     }
+
+
+    function gen_main_menu(){
+        // Generates the main menu
+        var init_menu = new WatchUi.Menu();
+        init_menu.setTitle("Select operation");
+        init_menu.addItem("Toggle all lights", :toggle_all_lights);
+        init_menu.addItem("Apply a Scene", :apply_scene);
+        init_menu.addItem("Toggle a light", :toggle_light);
+        init_menu.addItem("Exit", :exit);
+        return init_menu;
+    }
+
 
     function onReceive(args) {
         if (args instanceof Lang.String) {

@@ -7,33 +7,22 @@ class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
     var notify;
     var lifx_api;
     // Set up the callback to the view
-    function initialize(api_obj, handler) {
+    function initialize(api_obj) {
         WatchUi.BehaviorDelegate.initialize();
-        notify = handler;
         lifx_api = api_obj;
     }
 
-    // Handle menu button press
-    function onMenu() {
-//        // Use WatchUi.switchToView() ??
-//        // https://developer.garmin.com/downloads/connect-iq/monkey-c/doc/Toybox/WatchUi.html#switchToView-instance_method
-//        var menu = new WatchUi.Menu();
-//        var delegate;
-//        menu.setTitle("Select Scene");
-//        var num_scenes = lifx_api.scenes.size();
-//        System.println("Number of scenes to display: "+ num_scenes);
-//        for( var i = 0; i < num_scenes; i++ ) {
-//            menu.addItem(lifx_api.scenes[i]["name"], lifx_api.scenes[i]["scene_num"]);
-//        }
-//
-//        delegate = new LifxSceneInputDelegate(self.lifx_api);
-//        WatchUi.pushView(menu, delegate, WatchUi.SLIDE_IMMEDIATE);
-//        return true;
+    // Handle back button press to exit safely
+    function onBack() {
+        System.println("back pressed");
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return false;
     }
 
     function onSelect() {
-        return true;
+        return false;
     }
+
 }
 
 class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
@@ -46,6 +35,7 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
 
     function onMenuItem(item) {
         // Builds the sub menus for each option
+        Application.getApp().setSelection(true);
 
         System.println("Recieved item: " + item);
         if (item == :toggle_all_lights) {
@@ -75,6 +65,9 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
 
             delegate = new LifxLightInputDelegate(self.lifx_api);
             WatchUi.pushView(menu, delegate, WatchUi.SLIDE_IMMEDIATE);
+
+        } else if (item == :exit) {
+            System.exit();
         } else {
             System.println("Item not recognised: " + item);
         }

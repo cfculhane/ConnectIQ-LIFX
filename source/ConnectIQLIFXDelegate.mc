@@ -5,11 +5,9 @@ using Toybox.WatchUi;
 
 class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
     var notify;
-    var lifx_api;
     // Set up the callback to the view
     function initialize(api_obj) {
         WatchUi.BehaviorDelegate.initialize();
-        lifx_api = api_obj;
     }
 
     // Handle back button press to exit safely
@@ -77,13 +75,17 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
 
 class LifxSceneInputDelegate extends WatchUi.MenuInputDelegate {
     // Handles selection of a scene to apply
-    private var lifx_api;
+    var lifx_api;
     function initialize(api_obj) {
         MenuInputDelegate.initialize();
         lifx_api = api_obj;
     }
 
     function onMenuItem(item) {
+//        var loading_view = new ConnectIQLIFXView($.LIFX_API_OBJ);
+//        WatchUi.pushView(ConnectIQLIFXView, ConnectIQLIFXDelegate, WatchUi.SLIDE_IMMEDIATE);
+        lifx_api.applying_selection = true;
+        WatchUi.requestUpdate();
         System.println("Recieved item: " + item);
         var selected_scene = lifx_api.scenes[item];
         lifx_api.set_scene(selected_scene["uuid"]);
@@ -100,6 +102,8 @@ class LifxLightInputDelegate extends WatchUi.MenuInputDelegate {
     }
 
     function onMenuItem(item) {
+        lifx_api.applying_selection = true;
+        WatchUi.requestUpdate();
         System.println("Recieved item: " + item);
         var selected_light = lifx_api.lights[item];
         lifx_api.toggle_power("id:" + selected_light["id"]);

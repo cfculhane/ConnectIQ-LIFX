@@ -1,0 +1,5 @@
+<settings>
+    <setting propertyKey="@Properties.LIFX_API_KEY" title="@Strings.LIFX_API_KEY" prompt="@Strings.api_help" helpUrl="https://cloud.lifx.com/settings">
+        <settingConfig type="alphaNumeric"></settingConfig>
+    </setting>
+</settings>

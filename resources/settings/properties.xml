@@ -1,0 +1,3 @@
+<properties>
+    <property id="LIFX_API_KEY" type="string">""</property>
+</properties>

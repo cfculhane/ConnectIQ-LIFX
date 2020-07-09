@@ -24,8 +24,14 @@ class ConnectIQLIFXView extends WatchUi.View {
         // Start initial view
         var selection = Application.getApp().getSelection();
         if (selection == null) {
-            Application.getApp().setSelection(false);
-            WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+            if (self.lifx_api.auth_ok == true) {
+                WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+                Application.getApp().setSelection(false);
+            } else if (self.lifx_api.auth_ok == null){
+                mMessage = "Loading data from LIFX...";
+            } else {
+                mMessage = "Authentication error, Please \nset API Key in settings\nvia Garmin Connect";
+            }
         }
         else if (selection == false) {
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
@@ -34,9 +40,21 @@ class ConnectIQLIFXView extends WatchUi.View {
 
     // Update the view
     function onUpdate(dc) {
-//        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-//        dc.clear();
-//        dc.drawText(dc.getWidth()/2, dc.getHeight()/2, Graphics.FONT_MEDIUM, mMessage, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        System.println("onUpdate() called with lifx_api.auth_ok = " + self.lifx_api.auth_ok);
+        if (self.lifx_api.auth_ok == true && self.lifx_api.applying_selection == false) {
+            WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+            Application.getApp().setSelection(false);
+        } else {
+            System.println("onUpdate() pushing mMessage, lifx_api.applying_selection = " + self.lifx_api.applying_selection);
+            if (self.lifx_api.applying_selection == true) {
+                mMessage = "Sending signal to LIFX...";
+            }
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            dc.clear();
+            dc.drawText(dc.getWidth()/2, dc.getHeight()/2, Graphics.FONT_SYSTEM_TINY, mMessage, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        }
+
+
     }
 
     // Called when this View is removed from the screen. Save the

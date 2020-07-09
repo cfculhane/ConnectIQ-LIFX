@@ -1,17 +1,2 @@
 <resources>
-<settings>
-
-<setting propertyKey="@Properties.appVersion" title="@Strings.AppVersionTitle">
-<settingConfig type="alphaNumeric" readonly="true" />
-</setting>
-
-<setting propertyKey="@Properties.screenSleep" title="@Strings.ScreenSleepTitle">
-<settingConfig type="boolean" />
-</setting>
-
-<setting propertyKey='mysetting' title='TEST'>
-<settingConfig type="alphaNumeric" required="true" />
-</setting>
-
-</settings>
 </resources>

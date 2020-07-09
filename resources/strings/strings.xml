@@ -1,6 +1,9 @@
 <strings>
     <string id="AppName">ConnectIQ-LIFX</string>
-
     <string id="prompt">Click the menu button</string>
-
+    <string id="api_help">Enter the API key from LIFX</string>
+    <string id="api_key_url">https://cloud.lifx.com/settings</string>
+    <string id="Yes">Yes</string>
+    <string id="No">Yes</string>
+    <string id="LIFX_API_KEY">LIFX API KEY</string>
 </strings>

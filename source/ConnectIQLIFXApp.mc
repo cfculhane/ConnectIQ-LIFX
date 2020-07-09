@@ -2,6 +2,7 @@ using Toybox.Application;
 using Toybox.WatchUi;
 public var LIFX_API_KEY = null;
 public var LIFX_API_OBJ;
+
 class ConnectIQLIFXApp extends Application.AppBase {
     var mSelection;
 
@@ -10,12 +11,14 @@ class ConnectIQLIFXApp extends Application.AppBase {
     var main_delegate;
     function initialize() {
         AppBase.initialize();
+        LIFX_API_KEY = retrieve_api_key();
+        System.println("Starting with api key: " + LIFX_API_KEY);
+        LIFX_API_OBJ = new LIFX_API();
     }
 
     // onStart() is called on application start up
     function onStart(state) {
-        LIFX_API_KEY = retrieve_api_key();
-        System.println("Starting with api key: " + LIFX_API_KEY);
+
     }
 
     // onStop() is called when your application is exiting
@@ -24,9 +27,8 @@ class ConnectIQLIFXApp extends Application.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-        LIFX_API_OBJ = new LIFX_API();
-        main_delegate = new ConnectIQLIFXDelegate(LIFX_API_OBJ);
-        mView = new ConnectIQLIFXView(LIFX_API_OBJ);
+        main_delegate = new ConnectIQLIFXDelegate();
+        mView = new ConnectIQLIFXView();
         return [mView, main_delegate];
     }
 
@@ -41,6 +43,7 @@ class ConnectIQLIFXApp extends Application.AppBase {
     function onSettingsChanged() { // triggered by settings change in GCM
         LIFX_API_KEY = retrieve_api_key();
         System.println("Re-reading settings, retrieved api key: " + LIFX_API_KEY);
+        LIFX_API_OBJ = new LIFX_API();
         WatchUi.requestUpdate();   // update the view to reflect changes
         self.getInitialView();
     }

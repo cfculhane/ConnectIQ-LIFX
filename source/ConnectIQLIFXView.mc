@@ -1,22 +1,49 @@
 using Toybox.WatchUi;
 
+
+class SendingSignalView extends WatchUi.View {
+    // A basic view that just shows some text when a request is being made
+    hidden var mMessage = "Sending signal to LIFX...";
+    function initialize() {
+        WatchUi.View.initialize();
+    }
+    function onShow() {
+        // Start initial view
+    }
+    function onUpdate(dc) {
+        System.println("SendingSignalView: onUpdate() called");
+        if ($.LIFX_API_OBJ.applying_selection == true) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            dc.clear();
+            dc.drawText(dc.getWidth()/2, dc.getHeight()/2, Graphics.FONT_SYSTEM_TINY, mMessage, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        } else {
+            var selection = Application.getApp().getSelection();
+            if (selection == null || selection == true) {
+                System.println("SendingSignalView: creating new main menu");
+                WatchUi.pushView(new ConnectIQLIFXView(), new ConnectIQLIFXDelegate(), WatchUi.SLIDE_DOWN);
+                Application.getApp().setSelection(false);
+            } else if (selection == false) {
+                WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            }
+        }
+    }
+}
+
 class ConnectIQLIFXView extends WatchUi.View {
     // Initial view when app is first loaded
-    hidden var mMessage = "Press menu button";
+    hidden var mMessage = "Loading data from LIFX...";
     hidden var mModel;
-    hidden var lifx_api;
     var main_menu;
     var main_menu_delegate;
-    function initialize(api_obj) {
+    function initialize() {
         WatchUi.View.initialize();
-        lifx_api = api_obj;
     }
 
     // Load your resources here
     function onLayout(dc) {
         mMessage = "Loading data from LIFX...";
         main_menu = gen_main_menu();
-        main_menu_delegate = new LifxMainInputDelegate(self.lifx_api);
+        main_menu_delegate = new LifxMainInputDelegate();
     }
 
     // Restore the state of the app and prepare the view to be shown
@@ -24,11 +51,13 @@ class ConnectIQLIFXView extends WatchUi.View {
         // Start initial view
         var selection = Application.getApp().getSelection();
         if (selection == null) {
-            if (self.lifx_api.auth_ok == true) {
-                WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+            if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
+                WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
                 Application.getApp().setSelection(false);
-            } else if (self.lifx_api.auth_ok == null){
+            } else if ($.LIFX_API_OBJ.auth_ok == null){
                 mMessage = "Loading data from LIFX...";
+            } else if ($.LIFX_API_OBJ.applying_selection == true) {
+                mMessage = "Sending signal to LIFX...";
             } else {
                 mMessage = "Authentication error, Please \nset API Key in settings\nvia Garmin Connect";
             }
@@ -40,14 +69,16 @@ class ConnectIQLIFXView extends WatchUi.View {
 
     // Update the view
     function onUpdate(dc) {
-        System.println("onUpdate() called with lifx_api.auth_ok = " + self.lifx_api.auth_ok);
-        if (self.lifx_api.auth_ok == true && self.lifx_api.applying_selection == false) {
-            WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_IMMEDIATE);
+        System.println("onUpdate() called with $.LIFX_API_OBJ.auth_ok = " + $.LIFX_API_OBJ.auth_ok);
+        if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
+            WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
             Application.getApp().setSelection(false);
         } else {
-            System.println("onUpdate() pushing mMessage, lifx_api.applying_selection = " + self.lifx_api.applying_selection);
-            if (self.lifx_api.applying_selection == true) {
+            System.println("onUpdate() pushing mMessage, $.LIFX_API_OBJ.applying_selection = " + $.LIFX_API_OBJ.applying_selection);
+            if ($.LIFX_API_OBJ.applying_selection == true) {
                 mMessage = "Sending signal to LIFX...";
+            } else if ($.LIFX_API_OBJ.auth_ok == false) {
+                mMessage = "Authentication error, Please \nset API Key in settings\nvia Garmin Connect";
             }
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.clear();

@@ -6,6 +6,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+export/
 .eggs/
 lib/
 lib64/

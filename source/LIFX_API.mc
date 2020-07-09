@@ -7,13 +7,6 @@ using Toybox.Background;
 using Toybox.Application as app;
 
 
-
-
-//const API_TOKEN = "c7b6a7b2936032035025758fd1348d73e34a0e46b8601bee433466933c9b88a2";
-
-
-
-
 class LIFX_API extends WatchUi.BehaviorDelegate {
     var notify;
     var auth_ok;
@@ -23,19 +16,11 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
     public var locations;
     public var groups;
     public var access_token;
-    var mySetting = Application.getApp().getProperty("mySetting");
     const BASE_URL = "https://api.lifx.com/v1";
     var HEADERS = {"User-Agent"=> "connectIQ-LIFX/0.1.0",
                  "Authorization"=> "Bearer " + LIFX_API_KEY
                  };
 
-
-
-//    function isAuthenticated() {
-//        var app_obj = Application.getApp();
-//        var token = app_obj.getProperty(ACCESS_TOKEN);
-//        return (token != null);
-//    }
 
     function initialize() {
         self.auth_ok = null;
@@ -84,10 +69,11 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
             }
             System.println("Scene request Successful, written data below:");
             System.println(self.scenes);
-            WatchUi.requestUpdate();
+
         } else {
             self.auth_ok = false;
         }
+        WatchUi.requestUpdate();
 
     }
 
@@ -105,10 +91,10 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
             }
             System.println("Lights request Successful, written data below:");
             System.println(self.lights);
-            WatchUi.requestUpdate();
         } else {
             self.auth_ok = false;
         }
+        WatchUi.requestUpdate();
     }
 
 

@@ -17,14 +17,7 @@ class SendingSignalView extends WatchUi.View {
             dc.clear();
             dc.drawText(dc.getWidth()/2, dc.getHeight()/2, Graphics.FONT_SYSTEM_TINY, mMessage, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         } else {
-            var selection = Application.getApp().getSelection();
-            if (selection == null || selection == true) {
-                System.println("SendingSignalView: creating new main menu");
-                WatchUi.pushView(new ConnectIQLIFXView(), new ConnectIQLIFXDelegate(), WatchUi.SLIDE_DOWN);
-                Application.getApp().setSelection(false);
-            } else if (selection == false) {
-                WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-            }
+            WatchUi.popView(WatchUi.SLIDE_DOWN);  // Return to menu's screen
         }
     }
 }
@@ -52,7 +45,7 @@ class ConnectIQLIFXView extends WatchUi.View {
         var selection = Application.getApp().getSelection();
         if (selection == null) {
             if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
-                WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
+                WatchUi.switchToView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
                 Application.getApp().setSelection(false);
             } else if ($.LIFX_API_OBJ.auth_ok == null){
                 mMessage = "Loading data from LIFX...";
@@ -71,7 +64,7 @@ class ConnectIQLIFXView extends WatchUi.View {
     function onUpdate(dc) {
         System.println("onUpdate() called with $.LIFX_API_OBJ.auth_ok = " + $.LIFX_API_OBJ.auth_ok);
         if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
-            WatchUi.pushView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
+            WatchUi.switchToView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
             Application.getApp().setSelection(false);
         } else {
             System.println("onUpdate() pushing mMessage, $.LIFX_API_OBJ.applying_selection = " + $.LIFX_API_OBJ.applying_selection);

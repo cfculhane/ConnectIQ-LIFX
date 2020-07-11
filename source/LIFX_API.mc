@@ -27,8 +27,6 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         WatchUi.BehaviorDelegate.initialize();
         self.get_scenes();
         self.get_lights("all");
-        System.println("self.scenes: " + self.scenes);
-        System.println("self.lights: " + self.lights);
     }
 
     function is_http_ok(responseCode) {
@@ -73,7 +71,11 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         } else {
             self.auth_ok = false;
         }
-        WatchUi.requestUpdate();
+        if (self.lights != null || self.auth_ok == false) {
+            WatchUi.requestUpdate();
+        } else {
+            System.println("Waiting for parse_lights()...");
+        }
 
     }
 
@@ -94,7 +96,11 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         } else {
             self.auth_ok = false;
         }
-        WatchUi.requestUpdate();
+        if (self.scenes != null || self.auth_ok == false) {
+            WatchUi.requestUpdate();
+        } else {
+            System.println("Waiting for parse_scenes()...");
+        }
     }
 
 
@@ -140,7 +146,6 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
     function set_scene(scene_uuid) {
         self.applying_selection = true;
-        WatchUi.requestUpdate();
         var url_format = BASE_URL + "/scenes/scene_id:$1$/activate";                         // set the url
         var url = Lang.format(url_format, [scene_uuid]);
         System.println("Setting scene with URL : " + url);
@@ -158,7 +163,6 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
     function toggle_power(selector) {
         self.applying_selection = true;
-        WatchUi.requestUpdate();
         // Toggle power of a light / group / all etc
         // Selector is defined as per https://api.developer.lifx.com/v1/docs/selectors
         // e.g. 'all' for all lights, 'id:afs097fds87a4f' for a specific light ID

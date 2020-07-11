@@ -4,6 +4,7 @@ using Toybox.WatchUi;
 
 
 class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
+    // Base delegate, doesn't do much as the main menu is called once it's ready to be loaded
     var notify;
     // Set up the callback to the view
     function initialize() {
@@ -30,6 +31,11 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
 
         System.println("Recieved item: " + item);
         if (item == :toggle_all_lights) {
+            var loading_view = new SendingSignalView();
+            var loading_delegate = new ConnectIQLIFXDelegate();
+            WatchUi.pushView(loading_view, loading_delegate, WatchUi.SLIDE_DOWN);
+            $.LIFX_API_OBJ.applying_selection = true;
+            WatchUi.requestUpdate();
             $.LIFX_API_OBJ.toggle_power("all");
 
         } else if (item == :apply_scene) {
@@ -43,7 +49,7 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
             }
 
             delegate = new LifxSceneInputDelegate();
-            WatchUi.pushView(menu, delegate, WatchUi.SLIDE_IMMEDIATE);
+            WatchUi.pushView(menu, delegate, WatchUi.SLIDE_DOWN);
         } else if (item == :toggle_light) {
             var menu = new WatchUi.Menu();
             var delegate;
@@ -55,7 +61,7 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
             }
 
             delegate = new LifxLightInputDelegate();
-            WatchUi.pushView(menu, delegate, WatchUi.SLIDE_IMMEDIATE);
+            WatchUi.pushView(menu, delegate, WatchUi.SLIDE_DOWN);
 
         } else if (item == :exit) {
             System.exit();

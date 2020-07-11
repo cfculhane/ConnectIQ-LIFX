@@ -18,7 +18,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
     public var access_token;
     const BASE_URL = "https://api.lifx.com/v1";
     var HEADERS = {"User-Agent"=> "connectIQ-LIFX/0.1.0",
-                 "Authorization"=> "Bearer " + LIFX_API_KEY
+                 "Authorization"=> "Bearer " + $.LIFX_API_KEY
                  };
 
 

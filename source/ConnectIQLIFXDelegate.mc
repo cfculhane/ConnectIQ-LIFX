@@ -15,7 +15,7 @@ class ConnectIQLIFXDelegate extends WatchUi.BehaviorDelegate {
     function onBack() {
         System.println("ConnectIQLIFXDelegate: back pressed");
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        return false;
+        return true;
     }
 }
 
@@ -27,13 +27,12 @@ class LifxMainInputDelegate extends WatchUi.MenuInputDelegate {
 
     function onMenuItem(item) {
         // Builds the sub menus for each option
-        Application.getApp().setSelection(true);
 
         System.println("Recieved item: " + item);
         if (item == :toggle_all_lights) {
-            var loading_view = new SendingSignalView();
+            var loading_view = new SendingSignalView(true);
             var loading_delegate = new ConnectIQLIFXDelegate();
-            WatchUi.pushView(loading_view, loading_delegate, WatchUi.SLIDE_DOWN);
+            WatchUi.switchToView(loading_view, loading_delegate, WatchUi.SLIDE_DOWN);
             $.LIFX_API_OBJ.applying_selection = true;
             WatchUi.requestUpdate();
             $.LIFX_API_OBJ.toggle_power("all");
@@ -79,11 +78,10 @@ class LifxSceneInputDelegate extends WatchUi.MenuInputDelegate {
     }
 
     function onMenuItem(item) {
-        var loading_view = new SendingSignalView();
+        var loading_view = new SendingSignalView(false);
         var loading_delegate = new ConnectIQLIFXDelegate();
         WatchUi.pushView(loading_view, loading_delegate, WatchUi.SLIDE_DOWN);
         $.LIFX_API_OBJ.applying_selection = true;
-        WatchUi.requestUpdate();
         System.println("Recieved item: " + item);
         var selected_scene = $.LIFX_API_OBJ.scenes[item];
         $.LIFX_API_OBJ.set_scene(selected_scene["uuid"]);
@@ -98,11 +96,10 @@ class LifxLightInputDelegate extends WatchUi.MenuInputDelegate {
     }
 
     function onMenuItem(item) {
-        var loading_view = new SendingSignalView();
+        var loading_view = new SendingSignalView(false);
         var loading_delegate = new ConnectIQLIFXDelegate();
         WatchUi.pushView(loading_view, loading_delegate, WatchUi.SLIDE_DOWN);
         $.LIFX_API_OBJ.applying_selection = true;
-        WatchUi.requestUpdate();
         System.println("Recieved item: " + item);
         var selected_light = $.LIFX_API_OBJ.lights[item];
         $.LIFX_API_OBJ.toggle_power("id:" + selected_light["id"]);

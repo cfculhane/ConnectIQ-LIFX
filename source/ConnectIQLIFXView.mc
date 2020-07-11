@@ -4,20 +4,29 @@ using Toybox.WatchUi;
 class SendingSignalView extends WatchUi.View {
     // A basic view that just shows some text when a request is being made
     hidden var mMessage = "Sending signal to LIFX...";
-    function initialize() {
+    var create_menu = false;
+    function initialize(create_new_menu) {
         WatchUi.View.initialize();
+        create_menu = create_new_menu;
     }
     function onShow() {
         // Start initial view
     }
     function onUpdate(dc) {
-        System.println("SendingSignalView: onUpdate() called");
+        System.println("SendingSignalView: onUpdate() called with $.LIFX_API_OBJ.applying_selection : " + $.LIFX_API_OBJ.applying_selection);
         if ($.LIFX_API_OBJ.applying_selection == true) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.clear();
             dc.drawText(dc.getWidth()/2, dc.getHeight()/2, Graphics.FONT_SYSTEM_TINY, mMessage, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         } else {
-            WatchUi.popView(WatchUi.SLIDE_DOWN);  // Return to menu's screen
+            if (create_menu == false) {
+                WatchUi.popView(WatchUi.SLIDE_DOWN);  // Return to menu's screen
+            } else {
+                // This is neccesary for toggle_all_lights(), not quite sure why, but otherwise it wont return to the main menu properly
+                var main_delegate = new ConnectIQLIFXDelegate();
+                var mView = new ConnectIQLIFXView();
+                WatchUi.switchToView(mView, main_delegate, WatchUi.SLIDE_DOWN);
+            }
         }
     }
 }
@@ -42,30 +51,25 @@ class ConnectIQLIFXView extends WatchUi.View {
     // Restore the state of the app and prepare the view to be shown
     function onShow() {
         // Start initial view
-        var selection = Application.getApp().getSelection();
-        if (selection == null) {
-            if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
-                WatchUi.switchToView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
-                Application.getApp().setSelection(false);
-            } else if ($.LIFX_API_OBJ.auth_ok == null){
-                mMessage = "Loading data from LIFX...";
-            } else if ($.LIFX_API_OBJ.applying_selection == true) {
-                mMessage = "Sending signal to LIFX...";
-            } else {
+        System.println("ConnectIQLIFXView: onShow() called with $.LIFX_API_OBJ.auth_ok = " + $.LIFX_API_OBJ.auth_ok);
+
+        if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
+            WatchUi.switchToView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
+        } else if ($.LIFX_API_OBJ.auth_ok == null){
+            mMessage = "Loading data from LIFX...";
+        } else if ($.LIFX_API_OBJ.applying_selection == true) {
+            mMessage = "Sending signal to LIFX...";
+        } else {
                 mMessage = "Authentication error, Please \nset API Key in settings\nvia Garmin Connect";
-            }
-        }
-        else if (selection == false) {
-            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         }
     }
 
     // Update the view
     function onUpdate(dc) {
-        System.println("onUpdate() called with $.LIFX_API_OBJ.auth_ok = " + $.LIFX_API_OBJ.auth_ok);
+        System.println("ConnectIQLIFXView: onUpdate() called with $.LIFX_API_OBJ.auth_ok = " + $.LIFX_API_OBJ.auth_ok);
         if ($.LIFX_API_OBJ.auth_ok == true && $.LIFX_API_OBJ.applying_selection == false) {
             WatchUi.switchToView(main_menu, main_menu_delegate, WatchUi.SLIDE_DOWN);
-            Application.getApp().setSelection(false);
+//            Application.getApp().setSelection(false);
         } else {
             System.println("onUpdate() pushing mMessage, $.LIFX_API_OBJ.applying_selection = " + $.LIFX_API_OBJ.applying_selection);
             if ($.LIFX_API_OBJ.applying_selection == true) {
@@ -87,7 +91,6 @@ class ConnectIQLIFXView extends WatchUi.View {
         return true;
     }
 
-
     function gen_main_menu(){
         // Generates the main menu
         var init_menu = new WatchUi.Menu();
@@ -98,7 +101,6 @@ class ConnectIQLIFXView extends WatchUi.View {
         init_menu.addItem("Exit", :exit);
         return init_menu;
     }
-
 
     function onReceive(args) {
         if (args instanceof Lang.String) {

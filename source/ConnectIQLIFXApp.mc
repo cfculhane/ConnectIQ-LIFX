@@ -4,7 +4,7 @@ public var LIFX_API_KEY = null;
 public var LIFX_API_OBJ;
 
 class ConnectIQLIFXApp extends Application.AppBase {
-    var mSelection;
+//    var mSelection;
 
     hidden var mView;
     var lifx_api;
@@ -30,14 +30,6 @@ class ConnectIQLIFXApp extends Application.AppBase {
         main_delegate = new ConnectIQLIFXDelegate();
         mView = new ConnectIQLIFXView();
         return [mView, main_delegate];
-    }
-
-    function getSelection() {
-        return mSelection;
-    }
-
-    function setSelection(bool) {
-        mSelection = bool;
     }
 
     function onSettingsChanged() { // triggered by settings change in GCM

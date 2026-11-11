@@ -1,6 +1,8 @@
 // API interface to LIFX servers
 
 
+using Toybox.Lang;
+using Toybox.PersistedContent;
 using Toybox.Communications as comms;
 using Toybox.WatchUi;
 using Toybox.Background;
@@ -37,7 +39,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
         }
     }
 
-    function http_generic_handler(responseCode, data) {
+    function http_generic_handler(responseCode as Lang.Number, data as Lang.Dictionary or Lang.String or Lang.ByteArray or PersistedContent.Iterator or Null) as Void {
         if (is_http_ok(responseCode)){
             System.println("Request Successful, data below:");
             System.println(data);
@@ -52,7 +54,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
     }
 
 
-    function parse_scenes(responseCode, data) {
+    function parse_scenes(responseCode as Lang.Number, data as Lang.Dictionary or Lang.String or Lang.ByteArray or PersistedContent.Iterator or Null) as Void {
         // Handles returned JSON
 
         System.println("Scenes request completed with responseCode: " + responseCode.toString());
@@ -61,7 +63,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
             var num_scenes = data.size();
             System.println("Number of scenes returned: " + num_scenes);
 
-            self.scenes = data;
+            self.scenes = data as Lang.Array<Lang.Dictionary>;
             for( var i = 0; i < num_scenes; i++ ) {
                 self.scenes[i].put("scene_num", i);
             }
@@ -79,7 +81,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
 
     }
 
-    function parse_lights(responseCode, data) {
+    function parse_lights(responseCode as Lang.Number, data as Lang.Dictionary or Lang.String or Lang.ByteArray or PersistedContent.Iterator or Null) as Void {
         // Handles returned JSON
 
         System.println("Lights request completed with responseCode: " + responseCode.toString());
@@ -87,7 +89,7 @@ class LIFX_API extends WatchUi.BehaviorDelegate {
             self.auth_ok = true;
             var num_lights = data.size();
             System.println("Number of lights returned: " + num_lights);
-            self.lights = data;
+            self.lights = data as Lang.Array<Lang.Dictionary>;
             for( var i = 0; i < num_lights; i++ ) {
                 self.lights[i].put("light_num", i);  // Used as a symbol later on, has to be a number
             }

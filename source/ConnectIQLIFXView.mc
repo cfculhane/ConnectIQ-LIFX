@@ -88,7 +88,6 @@ class ConnectIQLIFXView extends WatchUi.View {
     // Called when this View is removed from the screen. Save the
     // state of your app here.
     function onHide() {
-        return true;
     }
 
     function gen_main_menu(){
